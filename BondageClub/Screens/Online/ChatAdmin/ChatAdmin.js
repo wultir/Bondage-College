@@ -42,6 +42,10 @@ function ChatAdminLoad() {
 	document.getElementById("InputBanList").setAttribute("maxLength", 1000);
 	document.getElementById("InputBanList").setAttribute("autocomplete", "off");
 	ElementValue("InputBanList", ChatAdminTemporaryData ? ChatAdminTemporaryData.BanList : CommonConvertArrayToString(ChatRoomData.Ban));
+	ElementCreateTextArea("InputInviteList");
+	document.getElementById("InputInviteList").setAttribute("maxLength", 250);
+	document.getElementById("InputInviteList").setAttribute("autocomplete", "off");
+	ElementValue("InputInviteList", ChatAdminTemporaryData ? ChatAdminTemporaryData.InviteList : CommonConvertArrayToString(ChatRoomData.PrivateInvite));
 	ChatAdminPrivate = ChatAdminTemporaryData ? ChatAdminTemporaryData.Private :ChatRoomData.Private;
 	ChatAdminLocked = ChatAdminTemporaryData ? ChatAdminTemporaryData.Locked : ChatRoomData.Locked;
 
@@ -51,6 +55,7 @@ function ChatAdminLoad() {
 		document.getElementById("InputDescription").setAttribute("disabled", "disabled");
 		document.getElementById("InputAdminList").setAttribute("disabled", "disabled");
 		document.getElementById("InputBanList").setAttribute("disabled", "disabled");
+		document.getElementById("InputInviteList").setAttribute("disabled", "disabled");
 		document.getElementById("InputSize").setAttribute("disabled", "disabled");
 		ChatAdminMessage = "AdminOnly";
 	} else ChatAdminMessage = "UseMemberNumbers";
@@ -72,9 +77,11 @@ function ChatAdminRun() {
 	DrawText(TextGet("RoomDescription"), 675, 255, "Black", "Gray");
 	ElementPosition("InputDescription", 675, 350, 1100, 140);
 	DrawText(TextGet("RoomAdminList"), 390, 490, "Black", "Gray");
-	ElementPosition("InputAdminList", 390, 685, 530, 300);
+	ElementPosition("InputAdminList", 390, 580, 530, 110);
 	DrawText(TextGet("RoomBanList"), 960, 490, "Black", "Gray");
-	ElementPosition("InputBanList", 960, 640, 530, 210);
+	ElementPosition("InputBanList", 960, 630, 530, 215);
+	DrawText(TextGet("RoomInviteList"), 390, 685, "Black", "Gray");
+	ElementPosition("InputInviteList", 390, 775, 530, 110);
 	DrawButton(695, 770, 250, 65, TextGet("QuickbanBlackList"), ChatRoomPlayerIsAdmin() ? "White" : "#ebebe4", null, null, !ChatRoomPlayerIsAdmin());
 	DrawButton(975, 770, 250, 65, TextGet("QuickbanGhostList"), ChatRoomPlayerIsAdmin() ? "White" : "#ebebe4", null, null, !ChatRoomPlayerIsAdmin());
 
@@ -135,6 +142,7 @@ function ChatAdminClick() {
 				Limit: ElementValue("InputSize"),
 				AdminList: ElementValue("InputAdminList"),
 				BanList: ElementValue("InputBanList"),
+				InviteList: ElementValue("InputInviteList"),
 				Private: ChatAdminPrivate,
 				Locked: ChatAdminLocked,
 			};
@@ -143,6 +151,7 @@ function ChatAdminClick() {
 			ElementRemove("InputSize");
 			ElementRemove("InputAdminList");
 			ElementRemove("InputBanList");
+			ElementRemove("InputInviteList");
 			if (MouseIn(1300, 575, 275, 60)) {
 				ChatBlockItemReturnData = { Screen: "ChatAdmin" };
 				ChatBlockItemCategory = ChatAdminBlockCategory;
@@ -172,6 +181,7 @@ function ChatAdminExit() {
 	ElementRemove("InputSize");
 	ElementRemove("InputAdminList");
 	ElementRemove("InputBanList");
+	ElementRemove("InputInviteList");
 	CommonSetScreen("Online", "ChatRoom");
 }
 
@@ -201,6 +211,7 @@ function ChatAdminUpdateRoom() {
 		BlockCategory: ChatAdminBlockCategory,
 		Game: ChatAdminGame,
 		Private: ChatAdminPrivate,
+		PrivateInvite: CommonConvertStringToArray(ElementValue("InputInviteList").trim()),
 		Locked: ChatAdminLocked
 	};
 	ServerSend("ChatRoomAdmin", { MemberNumber: Player.ID, Room: UpdatedRoom, Action: "Update" });

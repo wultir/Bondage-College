@@ -20,3 +20,4 @@ ResponseInvalidRoomData,Invalid chat room data detected
 BlockCategory,Block Items
 Game,No Game
 GameLARP,LARP
+RoomInviteList,Private Invite List
