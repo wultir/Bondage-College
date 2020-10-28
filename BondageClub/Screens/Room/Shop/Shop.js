@@ -117,15 +117,34 @@ function ShopAssetMissing(Asset) {
 }
 
 /**
+ * Checks if an asset can be bought and is currently worn by the player. An asset is considered missing if it is not owned and has a value greater than 0. (0 is a default item, -1 is a non-purchasable item)
+ * @param {Asset} asset - The asset to check for availability
+ * @returns {boolean} - Returns TRUE if the item is purchasable, worn and unowned.
+ */
+function ShopAssetMissingAndWorn(asset) {
+	if (!ShopAssetMissing(asset)) return false;
+	if (InventoryIsWorn(Player, asset.Name, asset.Group.Name)) return true;
+	
+	// If the item isn't worn, also check if any item in the same buy group is worn.
+	if (asset.BuyGroup != null)
+		for (let index = 0; index < Asset.length; index++)
+			if (ShopAssetIsInBuyGroup(Asset[index], asset.BuyGroup) && !InventoryAvailable(Player, Asset[index].Name, Asset[index].Group.Name) && InventoryIsWorn(Player, Asset[index].Name, Asset[index].Group.Name))
+				return true
+
+	return false;
+}
+
+/**
  * Used to display all the items the player does not own
+ * @param {boolean} [OnlyWorn=false] - Optional parameter that only displays worn items
  * @returns {void} - Nothing
  */
-function ShopSelectAssetMissing() {
+function ShopSelectAssetMissing(OnlyWorn) {
 	ShopVendor.FocusGroup = null;
 	ShopItemOffset = 0;
 	CurrentCharacter = null;
 	ShopStarted = true;
-	ShopSelectAsset = ShopAssetMissing;
+	ShopSelectAsset = OnlyWorn ? ShopAssetMissingAndWorn : ShopAssetMissing;
 	ShopText = TextGet("SelectItemBuy");
 	ShopCartBuild();
 }
