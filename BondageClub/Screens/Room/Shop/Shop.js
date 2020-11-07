@@ -189,20 +189,8 @@ function ShopClick() {
 
 					// Add the item and removes the money
 					CharacterChangeMoney(Player, ShopCart[A].Value * -1);
-					InventoryAdd(Player, ShopCart[A].Name, ShopCart[A].Group.Name, false);
+					ShopAddBoughtItem(ShopCart[A]);
 					ShopText = TextGet("ThankYou");
-
-					// Add any item that belongs in the same buy group
-					if (ShopCart[A].BuyGroup != null)
-						for (let B = 0; B < Asset.length; B++)
-							if (ShopAssetIsInBuyGroup(Asset[B], ShopCart[A].BuyGroup))
-								InventoryAdd(Player, Asset[B].Name, Asset[B].Group.Name, false);
-
-					if (ShopCart[A].PrerequisiteBuyGroups)
-						for (let B = 0; B < Asset.length; B++)
-							for (let C = 0; C < ShopCart[A].PrerequisiteBuyGroups.length; C++)
-								if (ShopAssetIsInBuyGroup(Asset[B], ShopCart[A].PrerequisiteBuyGroups[C]))
-									InventoryAdd(Player, Asset[B].Name, Asset[B].Group.Name, false);
 					
 					// Sync and rebuild the shop menu to be up-to-date
 					ServerPlayerInventorySync();
@@ -233,6 +221,27 @@ function ShopClick() {
 		}
 
 	}
+}
+
+/**
+ * Adds a purchased item, items in the same buy group and prerequisites to the player's inventoty.
+ * @param {Asset} item - The bought item to add to the inventory.
+ * @returns {void} - Nothing
+ */
+function ShopAddBoughtItem(item) {
+	InventoryAdd(Player, item.Name, item.Group.Name, false);
+
+	// Add any item that belongs in the same buy group
+	if (item.BuyGroup != null)
+		for (let index = 0; index < Asset.length; index++)
+			if (ShopAssetIsInBuyGroup(Asset[index], item.BuyGroup))
+				InventoryAdd(Player, Asset[index].Name, Asset[index].Group.Name, false);
+
+	if (item.PrerequisiteBuyGroups)
+		for (let assetIndex = 0; assetIndex < Asset.length; assetIndex++)
+			for (let buyGroupIndex = 0; buyGroupIndex < item.PrerequisiteBuyGroups.length; buyGroupIndex++)
+				if (ShopAssetIsInBuyGroup(Asset[assetIndex], item.PrerequisiteBuyGroups[buyGroupIndex]))
+					InventoryAdd(Player, Asset[assetIndex].Name, Asset[assetIndex].Group.Name, false);
 }
 
 /**
