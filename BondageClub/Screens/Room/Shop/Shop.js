@@ -113,7 +113,17 @@ function ShopAssetFocusGroup(Asset) {
  * @returns {boolean} - Returns TRUE if the item is purchasable and unowned.
  */
 function ShopAssetMissing(Asset) {
-	return (Asset != null) && (Asset.Group != null) && (Asset.Value > 0) && !InventoryAvailable(Player, Asset.Name, Asset.Group.Name);
+	return ShopAssetMissingForCharacter(Player, Asset);
+}
+
+/**
+ * Checks if an asset can be bought by a character. An asset is considered missing if it is not owned and has a value greater than 0. (0 is a default item, -1 is a non-purchasable item)
+ * @param {Character} character - The character to check for asset ownership
+ * @param {Asset} asset - The asset to check for availability
+ * @returns {boolean} - Returns TRUE if the item is purchasable and unowned.
+ */
+function ShopAssetMissingForCharacter(character, asset) {
+	return (asset != null) && (asset.Group != null) && (asset.Value > 0) && !InventoryAvailable(character, asset.Name, asset.Group.Name);
 }
 
 /**
@@ -122,12 +132,22 @@ function ShopAssetMissing(Asset) {
  * @returns {boolean} - Returns TRUE if the item is purchasable, worn and unowned.
  */
 function ShopAssetMissingAndWorn(asset) {
-	if (!ShopAssetMissing(asset)) return false;
-	if (InventoryIsWorn(Player, asset.Name, asset.Group.Name)) return true;
-	
+	return ShopAssetMissingAndWornForCharacter(Player, asset);
+}
+
+/**
+ * Checks if an asset can be bought and is currently worn by a character. An asset is considered missing if it is not owned and has a value greater than 0. (0 is a default item, -1 is a non-purchasable item)
+ * @param {Character} character - The character to check for asset ownership
+ * @param {Asset} asset - The asset to check for availability
+ * @returns {boolean} - Returns TRUE if the item is purchasable, worn and unowned.
+ */
+function ShopAssetMissingAndWornForCharacter(character, asset) {
+	if (!ShopAssetMissingForCharacter(character, asset)) return false;
+	if (InventoryIsWorn(character, asset.Name, asset.Group.Name)) return true;
+
 	// If the item isn't worn, also check if any item in the same buy group is worn.
 	if (asset.BuyGroup != null)
-		return Asset.some(otherAsset => ShopAssetIsInBuyGroupAndWorn(Player, otherAsset, asset.BuyGroup));
+		return Asset.some(otherAsset => ShopAssetIsInBuyGroupAndWorn(character, otherAsset, asset.BuyGroup));
 
 	return false;
 }
