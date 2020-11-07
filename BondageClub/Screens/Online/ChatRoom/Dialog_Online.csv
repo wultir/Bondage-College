@@ -86,7 +86,10 @@ PlayerGagged,,,(You don't have access to use or remove items on her.),,!DialogDo
 40,0,(Help her stand.),(You help her up on her feet.),KneelStandAssist(),CanAssistStand()
 40,0,(Help her kneel.),(You help her down on her knees.),KneelStandAssist(),CanAssistKneel()
 40,0,(Help her to struggle free.),,StruggleAssist(),CanAssistStruggle()
+40,41,(Pay for her worn clothes she doesn't own),Paying for her clothes will cost you $REPLACEMONEY,,CanSendClothesGift()
 40,0,(Back to main menu.),(Main menu.),,
+41,0,(Pay for the clothes.),(You send $REPLACEMONEY for her clothes),SendClothesGift(),CanSendClothesGift()
+41,0,(Back to character actions.),(Possible character actions.),,
 100,110,(Wardrobe access.),(Select her wardrobe access.),,
 100,120,(Whisper rules.),(Select her rules for whispering when you're in the same room.),,
 100,130,(Key and locks restrictions.),(Select her restrictions for keys and locks.),,

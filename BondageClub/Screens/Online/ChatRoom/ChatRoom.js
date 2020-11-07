@@ -125,7 +125,7 @@ function ChatRoomCanAssistStruggle() { return CurrentCharacter.AllowItem && !Cur
  * Checks if the character options menu is available.
  * @returns {boolean} - Whether or not the player can interact with the target character
  */
-function ChatRoomCanPerformCharacterAction() { return ChatRoomCanAssistStand() ||  ChatRoomCanAssistKneel() || ChatRoomCanAssistStruggle()}
+function ChatRoomCanPerformCharacterAction() { return ChatRoomCanAssistStand() ||  ChatRoomCanAssistKneel() || ChatRoomCanAssistStruggle() || ChatRoomCanSendClothesGift() }
 /**
  * Checks if the target character can be helped back on her feet. This is different than CurrentCharacter.CanKneel() because it listens for the current active pose and removes certain checks that are not required for someone else to help a person kneel down.
  * @returns {boolean} - Whether or not the target character can stand
@@ -991,6 +991,7 @@ function ChatRoomMessage(data) {
 				if (msg == "MaidDrinkPick10") MaidQuartersOnlineDrinkPick(data.Sender, 10);
 				if (msg.substring(0, 8) == "PayQuest") ChatRoomPayQuest(data);
 				if (msg.substring(0, 9) == "OwnerRule") data = ChatRoomSetRule(data);
+				if (msg == "ClothesGift") ChatRoomReceiveClothesGift();
 				if (data.Type == "Hidden") return;
 			}
 
@@ -1901,4 +1902,62 @@ function ChatRoomConcatenateBanList(IncludesBlackList, IncludesGhostList, Existi
 	if (IncludesBlackList) BanList = BanList.concat(Player.BlackList);
 	if (IncludesGhostList) BanList = BanList.concat(Player.GhostList);
 	return BanList.filter((MemberNumber, Idx, Arr) => Arr.indexOf(MemberNumber) == Idx);
+}
+
+/**
+ * Sends gifted clothes to another member.
+ * @returns {void} - Nothing
+ */
+function ChatRoomSendClothesGift() {
+	var Value = ChatRoomCalculateClothesGiftValue();
+	if (Value > 0) {
+		var Dictionary = [
+			{ Tag: "TargetCharacter", Text: CurrentCharacter.Name, MemberNumber: CurrentCharacter.MemberNumber },
+			{ Tag: "SourceCharacter", Text: Player.Name, MemberNumber: Player.MemberNumber }
+		];
+		ServerSend("ChatRoomChat", { Content: "ActionSentClothesGift", Type: "Action", Dictionary: Dictionary });
+		ServerSend("ChatRoomChat", { Content: "ClothesGift", Type: "Hidden", Target: CurrentCharacter.MemberNumber });
+		CharacterChangeMoney(Player, -Value);
+		DialogLeave();
+	}
+}
+
+/**
+ * Handles the reception of gifted clothes by adding worn but not owned clothes to the player's inventory.
+ * @returns {void} - Nothing
+ */
+function ChatRoomReceiveClothesGift() {
+	for (let A = 0; A < Asset.length; A++)
+		if (ShopAssetMissingAndWorn(Asset[A]) && Asset[A].Group.Clothing)
+			ShopAddBoughtItem(Asset[A]);
+	ServerPlayerInventorySync();
+	ChatRoomCharacterUpdate(Player);
+}
+
+/**
+ * Checks if the player can send money for worn, missing clothes to the current character.
+ * @returns {boolean} - TRUE if the current character has missing clothes and the player has enough money.
+ */
+function ChatRoomCanSendClothesGift() {
+	var Value = ChatRoomCalculateClothesGiftValue();
+
+	if((CurrentCharacter != null) && (CurrentCharacter.CurrentDialog != null))
+		CurrentCharacter.CurrentDialog = CurrentCharacter.CurrentDialog.replace("REPLACEMONEY", Value.toString());
+
+	return Value > 0;
+}
+
+/**
+ * Calculates the value of worn, missing clothes for the current character.
+ * @return {number} - Total value of clothing items the current character is wearing but doesn't own.
+ */
+function ChatRoomCalculateClothesGiftValue() {
+	if(CurrentCharacter == null) return 0;
+	
+	var Value = 0;
+	for (let A = 0; A < Asset.length; A++)
+		if (ShopAssetMissingAndWornForCharacter(CurrentCharacter, Asset[A]) && Asset[A].Group.Clothing)
+			Value += Asset[A].Value
+
+	return Value;
 }
