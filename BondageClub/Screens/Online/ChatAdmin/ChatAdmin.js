@@ -10,6 +10,7 @@ var ChatAdminGameList = ["", "LARP"];
 var ChatAdminBackgroundSelected = null;
 var ChatAdminTemporaryData = null;
 var ChatAdminBlockCategory = [];
+var ChatAdminPrivateInviteOnBeep = false;
 
 /**
  * Loads the chat Admin screen properties and creates the inputs
@@ -48,6 +49,7 @@ function ChatAdminLoad() {
 	ElementValue("InputInviteList", ChatAdminTemporaryData ? ChatAdminTemporaryData.InviteList : CommonConvertArrayToString(ChatRoomData.PrivateInvite));
 	ChatAdminPrivate = ChatAdminTemporaryData ? ChatAdminTemporaryData.Private :ChatRoomData.Private;
 	ChatAdminLocked = ChatAdminTemporaryData ? ChatAdminTemporaryData.Locked : ChatRoomData.Locked;
+	ChatAdminPrivateInviteOnBeep = ChatAdminTemporaryData ? ChatAdminTemporaryData.PrivateInviteOnBeep : ChatRoomData.PrivateInviteOnBeep;
 
 	// If the player isn't an admin, we disable the inputs
 	if (!ChatRoomPlayerIsAdmin()) {
@@ -95,10 +97,14 @@ function ChatAdminRun() {
 	DrawBackNextButton(1625, 575, 275, 60, TextGet("Game" + ChatAdminGame), ChatRoomPlayerIsAdmin() ? "White" : "#ebebe4", null, () => "", () => "");
 
 	// Private and Locked check boxes
-	DrawText(TextGet("RoomPrivate"), 1384, 740, "Black", "Gray");
-	DrawButton(1486, 708, 64, 64, "", ChatRoomPlayerIsAdmin() ? "White" : "#ebebe4", ChatAdminPrivate ? "Icons/Checked.png" : "", null, !ChatRoomPlayerIsAdmin());
-	DrawText(TextGet("RoomLocked"), 1684, 740, "Black", "Gray");
-	DrawButton(1786, 708, 64, 64, "", ChatRoomPlayerIsAdmin() ? "White" : "#ebebe4", ChatAdminLocked ? "Icons/Checked.png" : "", null, !ChatRoomPlayerIsAdmin());
+	DrawText(TextGet("RoomPrivate"), 1364, 670, "Black", "Gray");
+	DrawButton(1436, 638, 64, 64, "", ChatRoomPlayerIsAdmin() ? "White" : "#ebebe4", ChatAdminPrivate ? "Icons/Checked.png" : "", null, !ChatRoomPlayerIsAdmin());
+	DrawText(TextGet("RoomLocked"), 1364, 760, "Black", "Gray");
+	DrawButton(1436, 728, 64, 64, "", ChatRoomPlayerIsAdmin() ? "White" : "#ebebe4", ChatAdminLocked ? "Icons/Checked.png" : "", null, !ChatRoomPlayerIsAdmin());
+
+	// Automatic invite on beep checkbox
+	DrawText(TextGet("RoomPrivateInviteOnBeep"), 1684, 670, "Black", "Gray");
+	DrawButton(1836, 638, 64, 64, "", ChatRoomPlayerIsAdmin() ? "White" : "#ebebe4", ChatAdminPrivateInviteOnBeep ? "Icons/Checked.png" : "", null, !ChatRoomPlayerIsAdmin());
 
 	// Save & Cancel/Exit buttons + help text
 	DrawButton(1325, 840, 250, 65, TextGet("Save"), ChatRoomPlayerIsAdmin() ? "White" : "#ebebe4", null, null, !ChatRoomPlayerIsAdmin());
@@ -145,6 +151,7 @@ function ChatAdminClick() {
 				InviteList: ElementValue("InputInviteList"),
 				Private: ChatAdminPrivate,
 				Locked: ChatAdminLocked,
+				PrivateInviteOnBeep: ChatAdminPrivateInviteOnBeep,
 			};
 			ElementRemove("InputName");
 			ElementRemove("InputDescription");
@@ -160,8 +167,9 @@ function ChatAdminClick() {
 		}
 
 		// Private & Locked check boxes + save button + quickban buttons
-		if ((MouseX >= 1486) && (MouseX <= 1550) && (MouseY >= 708) && (MouseY <= 772)) ChatAdminPrivate = !ChatAdminPrivate;
-		if ((MouseX >= 1786) && (MouseX <= 1850) && (MouseY >= 708) && (MouseY <= 772)) ChatAdminLocked = !ChatAdminLocked;
+		if ((MouseX >= 1436) && (MouseX <= 1500) && (MouseY >= 638) && (MouseY <= 702)) ChatAdminPrivate = !ChatAdminPrivate;
+		if ((MouseX >= 1436) && (MouseX <= 1500) && (MouseY >= 728) && (MouseY <= 792)) ChatAdminLocked = !ChatAdminLocked;
+		if ((MouseX >= 1836) && (MouseX <= 1900) && (MouseY >= 638) && (MouseY <= 702)) ChatAdminPrivateInviteOnBeep = !ChatAdminPrivateInviteOnBeep;
 		if ((MouseX >= 1325) && (MouseX < 1575) && (MouseY >= 840) && (MouseY < 905) && ChatRoomPlayerIsAdmin()) ChatAdminUpdateRoom();
 		if ((MouseX >= 695) && (MouseX < 945) && (MouseY >= 770) && (MouseY < 835)) ElementValue("InputBanList", CommonConvertArrayToString(ChatRoomConcatenateBanList(true, false, CommonConvertStringToArray(ElementValue("InputBanList").trim()))));
 		if ((MouseX >= 975) && (MouseX < 1225) && (MouseY >= 770) && (MouseY < 835)) ElementValue("InputBanList", CommonConvertArrayToString(ChatRoomConcatenateBanList(false, true, CommonConvertStringToArray(ElementValue("InputBanList").trim()))));
@@ -212,7 +220,8 @@ function ChatAdminUpdateRoom() {
 		Game: ChatAdminGame,
 		Private: ChatAdminPrivate,
 		PrivateInvite: CommonConvertStringToArray(ElementValue("InputInviteList").trim()),
-		Locked: ChatAdminLocked
+		Locked: ChatAdminLocked,
+		PrivateInviteOnBeep: ChatAdminPrivateInviteOnBeep
 	};
 	ServerSend("ChatRoomAdmin", { MemberNumber: Player.ID, Room: UpdatedRoom, Action: "Update" });
 	ChatAdminMessage = "UpdatingRoom";
