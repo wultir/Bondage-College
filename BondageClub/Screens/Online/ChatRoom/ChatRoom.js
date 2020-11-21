@@ -786,19 +786,8 @@ function ChatRoomSendChat() {
 					if (ChatRoomTargetMemberNumber == ChatRoomCharacter[C].MemberNumber)
 						TargetName = ChatRoomCharacter[C].Name;
 
-				var div = document.createElement("div");
-				div.setAttribute('class', 'ChatMessage ChatMessageWhisper');
-				div.setAttribute('data-time', ChatRoomCurrentTime());
-				div.setAttribute('data-sender', Player.MemberNumber.toString());
-				div.innerHTML = TextGet("WhisperTo") + " " + TargetName + ": " + msg;
-
-				var Refocus = document.activeElement.id == "InputChat";
-				var ShouldScrollDown = ElementIsScrolledToEnd("TextAreaChatLog");
-				if (document.getElementById("TextAreaChatLog") != null) {
-					document.getElementById("TextAreaChatLog").appendChild(div);
-					if (ShouldScrollDown) ElementScrollToEnd("TextAreaChatLog");
-					if (Refocus) ElementFocus("InputChat");
-				}
+				var message = TextGet("WhisperTo") + " " + TargetName + ": " + msg;
+				ChatRoomAddMessage(message, "Whisper", Player.MemberNumber);
 			}
 		}	else {
 				// Throw an error message
@@ -1135,27 +1124,42 @@ function ChatRoomMessage(data) {
 
 			}
 
-			// Adds the message and scrolls down unless the user has scrolled up
-			var div = document.createElement("div");
-			div.setAttribute('class', 'ChatMessage ChatMessage' + data.Type + MsgEnterLeave);
-			div.setAttribute('data-time', ChatRoomCurrentTime());
-			div.setAttribute('data-sender', data.Sender);
-			if (data.Type == "Emote" || data.Type == "Action" || data.Type == "Activity")
-				div.setAttribute('style', 'background-color:' + ChatRoomGetTransparentColor(SenderCharacter.LabelColor) + ';');
-			div.innerHTML = msg;
-
-			// Returns the focus on the chat box
-			var Refocus = document.activeElement.id == "InputChat";
-			var ShouldScrollDown = ElementIsScrolledToEnd("TextAreaChatLog");
-			if (document.getElementById("TextAreaChatLog") != null) {
-				document.getElementById("TextAreaChatLog").appendChild(div);
-				if (ShouldScrollDown) ElementScrollToEnd("TextAreaChatLog");
-				if (Refocus) ElementFocus("InputChat");
-			}
-
+			var transparentBackground = (data.Type == "Emote" || data.Type == "Action" || data.Type == "Activity")
+				? ChatRoomGetTransparentColor(SenderCharacter.LabelColor)
+				: "";
+			ChatRoomAddMessage(msg, data.Type + MsgEnterLeave, data.Sender, transparentBackground);
 		}
 	}
 }
+
+/**
+ * Adds a message to the chat log
+ * @param {string} message - Message to add to the log 
+ * @param {string} messageClass - Message type and optionally additional classes to determine how the message is displayed
+ * @param {string} sender - Member number of the sender
+ * @param {string} [backgroundColor] - Optional background color to set on the message
+ * @returns {void} - Nothing.
+ */
+function ChatRoomAddMessage(message, messageClass, sender, backgroundColor) {
+	// Adds the message and scrolls down unless the user has scrolled up
+	var div = document.createElement("div");
+	div.setAttribute('class', 'ChatMessage ChatMessage' + messageClass);
+	div.setAttribute('data-time', ChatRoomCurrentTime());
+	div.setAttribute('data-sender', sender);
+	if (backgroundColor != null && backgroundColor != "")
+		div.setAttribute('style', 'background-color:' + backgroundColor + ';');
+	div.innerHTML = message;
+
+	// Returns the focus on the chat box
+	var refocus = document.activeElement.id == "InputChat";
+	var shouldScrollDown = ElementIsScrolledToEnd("TextAreaChatLog");
+	if (document.getElementById("TextAreaChatLog") != null) {
+		document.getElementById("TextAreaChatLog").appendChild(div);
+		if (shouldScrollDown) ElementScrollToEnd("TextAreaChatLog");
+		if (refocus) ElementFocus("InputChat");
+	}
+}
+
 
 /**
  * Handles the reception of the new room data from the server.
