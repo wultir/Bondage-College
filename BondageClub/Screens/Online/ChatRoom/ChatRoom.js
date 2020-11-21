@@ -1087,10 +1087,7 @@ function ChatRoomMessage(data) {
 					}
 				}
 				else if (data.Type == "Emote") {
-					if (msg.indexOf("*") == 0) msg = msg + "*";
-					else if ((msg.indexOf("'") == 0) || (msg.indexOf(",") == 0)) msg = "*" + SenderCharacter.Name + msg + "*";
-					else if (PreferenceIsPlayerInSensDep() && SenderCharacter.MemberNumber != Player.MemberNumber) msg = "*" + DialogFind(Player, "Someone") + " " + msg + "*";
-					else msg = "*" + SenderCharacter.Name + " " + msg + "*";
+					msg = ChatRoomFormatEmote(msg, SenderCharacter);
 				}
 				else if (data.Type == "Action") msg = "(" + msg + ")";
 				else if (data.Type == "ServerMessage") msg = "<b>" + msg + "</b>";
@@ -1160,6 +1157,20 @@ function ChatRoomAddMessage(message, messageClass, sender, backgroundColor) {
 	}
 }
 
+/**
+ * Formats an emote message based on whether sender name should be added and any sense dep settings
+ * @param {string} message - Emote message
+ * @param {*} senderCharacter - The character sending the emote
+ * @returns {void} - Nothing.
+ */
+function ChatRoomFormatEmote(message, senderCharacter) {
+	if (message.indexOf("*") == 0) message = message + "*";
+	else if ((message.indexOf("'") == 0) || (message.indexOf(",") == 0)) message = "*" + senderCharacter.Name + message + "*";
+	else if (PreferenceIsPlayerInSensDep() && senderCharacter.MemberNumber != Player.MemberNumber) message = "*" + DialogFind(Player, "Someone") + " " + message + "*";
+	else message = "*" + senderCharacter.Name + " " + message + "*";
+
+	return message;
+}
 
 /**
  * Handles the reception of the new room data from the server.
