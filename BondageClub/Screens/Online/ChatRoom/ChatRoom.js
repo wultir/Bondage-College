@@ -437,15 +437,11 @@ function ChatRoomFirstTimeHelp() {
  * @returns {void} - Nothing.
  */
 function ChatRoomTarget() {
-	var TargetName = null;
-	if (ChatRoomTargetMemberNumber != null) {
-		TargetName = ChatRoomGetWhisperTargetName();
-		if (TargetName == null) ChatRoomTargetMemberNumber = null;
-	}
+	const targetName = ChatRoomGetWhisperTargetName();
 	let placeholder = TextGet("PublicChat");
-	if (ChatRoomTargetMemberNumber != null) {
+	if (targetName != null) {
 		placeholder = TextGet("WhisperTo");
-		placeholder += " " + TargetName;
+		placeholder += " " + targetName;
 	}
 	document.getElementById("InputChat").placeholder = placeholder;
 }
