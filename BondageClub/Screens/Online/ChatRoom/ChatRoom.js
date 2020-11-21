@@ -439,9 +439,7 @@ function ChatRoomFirstTimeHelp() {
 function ChatRoomTarget() {
 	var TargetName = null;
 	if (ChatRoomTargetMemberNumber != null) {
-		for (let C = 0; C < ChatRoomCharacter.length; C++)
-			if (ChatRoomTargetMemberNumber == ChatRoomCharacter[C].MemberNumber)
-				TargetName = ChatRoomCharacter[C].Name;
+		TargetName = ChatRoomGetWhisperTargetName();
 		if (TargetName == null) ChatRoomTargetMemberNumber = null;
 	}
 	let placeholder = TextGet("PublicChat");
@@ -450,6 +448,17 @@ function ChatRoomTarget() {
 		placeholder += " " + TargetName;
 	}
 	document.getElementById("InputChat").placeholder = placeholder;
+}
+
+/**
+ * Gets the name of the currently selected chat room whisper target
+ * @returns {string}
+ */
+function ChatRoomGetWhisperTargetName() {
+	if (ChatRoomTargetMemberNumber == null) return null;
+
+	const target = ChatRoomCharacter.find(character => ChatRoomTargetMemberNumber == character.MemberNumber)
+	return target != null ? target.Name : null;
 }
 
 /**
@@ -781,10 +790,7 @@ function ChatRoomSendChat() {
 			} else {
 				// The whispers get sent to the server and shown on the client directly
 				ServerSend("ChatRoomChat", { Content: msg, Type: "Whisper", Target: ChatRoomTargetMemberNumber });
-				var TargetName = "";
-				for (let C = 0; C < ChatRoomCharacter.length; C++)
-					if (ChatRoomTargetMemberNumber == ChatRoomCharacter[C].MemberNumber)
-						TargetName = ChatRoomCharacter[C].Name;
+				var TargetName = ChatRoomGetWhisperTargetName();
 
 				var message = TextGet("WhisperTo") + " " + TargetName + ": " + msg;
 				ChatRoomAddMessage(message, "Whisper", Player.MemberNumber);
