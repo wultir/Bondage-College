@@ -178,13 +178,13 @@ function ShopClick() {
 					// Add any item that belongs in the same buy group
 					if (ShopCart[A].BuyGroup != null)
 						for (let B = 0; B < Asset.length; B++)
-							if ((Asset[B] != null) && (Asset[B].BuyGroup != null) && (Asset[B].BuyGroup == ShopCart[A].BuyGroup))
+							if (ShopAssetIsInBuyGroup(Asset[B], ShopCart[A].BuyGroup))
 								InventoryAdd(Player, Asset[B].Name, Asset[B].Group.Name, false);
 
 					if (ShopCart[A].PrerequisiteBuyGroups)
 						for (let B = 0; B < Asset.length; B++)
 							for (let C = 0; C < ShopCart[A].PrerequisiteBuyGroups.length; C++)
-								if ((Asset[B]) && (Asset[B].BuyGroup != null) && (Asset[B].BuyGroup == ShopCart[A].PrerequisiteBuyGroups[C]))
+								if (ShopAssetIsInBuyGroup(Asset[B], ShopCart[A].PrerequisiteBuyGroups[C]))
 									InventoryAdd(Player, Asset[B].Name, Asset[B].Group.Name, false);
 					
 					// Sync and rebuild the shop menu to be up-to-date
@@ -323,4 +323,14 @@ function ShopJobStart() {
 	EmptyCharacter.push(Player);
 	EmptyCharacter.push(ShopCustomer);
 	CommonSetScreen("Room", "Empty");
+}
+
+/**
+ * Checks if an asset is in a specific buy group.
+ * @param {Asset} asset - Asset to check the buy group of
+ * @param {string} buyGroup - Buy group name
+ * @return {boolean} - Returns TRUE of the two assets have the same buy group and it isn't null
+ */
+function ShopAssetIsInBuyGroup(asset, buyGroup) {
+	return (asset != null) && (asset.BuyGroup != null) && (asset.BuyGroup == buyGroup);
 }
