@@ -127,9 +127,7 @@ function ShopAssetMissingAndWorn(asset) {
 	
 	// If the item isn't worn, also check if any item in the same buy group is worn.
 	if (asset.BuyGroup != null)
-		for (let index = 0; index < Asset.length; index++)
-			if (ShopAssetIsInBuyGroup(Asset[index], asset.BuyGroup) && !InventoryAvailable(Player, Asset[index].Name, Asset[index].Group.Name) && InventoryIsWorn(Player, Asset[index].Name, Asset[index].Group.Name))
-				return true
+		return Asset.some(otherAsset => ShopAssetIsInBuyGroupAndWorn(Player, otherAsset, asset.BuyGroup));
 
 	return false;
 }
@@ -352,4 +350,14 @@ function ShopJobStart() {
  */
 function ShopAssetIsInBuyGroup(asset, buyGroup) {
 	return (asset != null) && (asset.BuyGroup != null) && (asset.BuyGroup == buyGroup);
+}
+
+/**
+ * Checks is an item is in a specific buy group and is worn by a specific character.
+ * @param {Character} character - Character to check if they have the item worn
+ * @param {Asset} asset - Asset to check
+ * @param {string} buyGroup - Buy group to check on the asset
+ */
+function ShopAssetIsInBuyGroupAndWorn(character, asset, buyGroup) {
+	return ShopAssetIsInBuyGroup(asset, buyGroup) && InventoryIsWorn(character, asset.Name, asset.Group.Name);
 }
