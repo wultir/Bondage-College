@@ -1927,9 +1927,8 @@ function ChatRoomSendClothesGift() {
  * @returns {void} - Nothing
  */
 function ChatRoomReceiveClothesGift() {
-	for (let A = 0; A < Asset.length; A++)
-		if (ShopAssetMissingAndWorn(Asset[A]) && Asset[A].Group.Clothing)
-			ShopAddBoughtItem(Asset[A]);
+	Asset.filter(asset => ChatRoomIsMissingAndWornClothing(Player, asset))
+		.forEach(ShopAddBoughtItem);
 	ServerPlayerInventorySync();
 	ChatRoomCharacterUpdate(Player);
 }
@@ -1954,10 +1953,17 @@ function ChatRoomCanSendClothesGift() {
 function ChatRoomCalculateClothesGiftValue() {
 	if(CurrentCharacter == null) return 0;
 	
-	var Value = 0;
-	for (let A = 0; A < Asset.length; A++)
-		if (ShopAssetMissingAndWornForCharacter(CurrentCharacter, Asset[A]) && Asset[A].Group.Clothing)
-			Value += Asset[A].Value
+	return Asset.filter(asset => ChatRoomIsMissingAndWornClothing(CurrentCharacter, asset))
+		.map(asset => asset.Value)
+		.reduce((valueSum, assetValue) => valueSum + assetValue, 0);
+}
 
-	return Value;
+/**
+ * Checks if an asset is clothing and worn but not owned by the currently selected character
+ * @param {Character} character - Character to check if they are wearing and whether they own the item
+ * @param {Asset} asset - Asset to check
+ * @returns {boolean} - TRUE if the item is a cloting item, worn but not owned by the selected character.
+ */
+function ChatRoomIsMissingAndWornClothing(character, asset) {
+	return asset.Group != null && asset.Group.Clothing && ShopAssetMissingAndWornForCharacter(character, asset);
 }
