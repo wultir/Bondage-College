@@ -760,7 +760,7 @@ function ChatRoomSendChat() {
 			msg = msg.replace("*", "");
 			msg = msg.replace(/\/me /g, "");
 			msg = msg.replace(/\/action /g, "*");
-			if (msg != "") ServerSend("ChatRoomChat", { Content: msg, Type: "Emote" });
+			if (msg != "") ChatRoomSendEmote(msg);
 
 		}
 		else if (m.indexOf("/help") == 0) ServerSend("ChatRoomChat", { Content: "ChatRoomHelp", Type: "Action", Target: Player.MemberNumber});
@@ -788,8 +788,8 @@ function ChatRoomSendChat() {
 				ServerSend("ChatRoomChat", { Content: msg, Type: "Whisper", Target: ChatRoomTargetMemberNumber });
 				var TargetName = ChatRoomGetWhisperTargetName();
 
-				var message = TextGet("WhisperTo") + " " + TargetName + ": " + msg;
-				ChatRoomAddMessage(message, "Whisper", Player.MemberNumber);
+				var formattedMessage = TextGet("WhisperTo") + " " + TargetName + ": " + msg;
+				ChatRoomAddMessage(formattedMessage, "Whisper", Player.MemberNumber);
 			}
 		}	else {
 				// Throw an error message
@@ -800,6 +800,25 @@ function ChatRoomSendChat() {
 
 	}
 
+}
+
+/**
+ * Sends a message as an emote.
+ * @param {string} message - Emote message to send.
+ * @returns {void} - Nothing.
+ */
+function ChatRoomSendEmote(message) {
+	// Get whisper target if whispered emotes are enabled
+	const emoteTarget = Player.ChatSettings.WhisperedEmotes ? ChatRoomTargetMemberNumber : null;
+
+	ServerSend("ChatRoomChat", { Content: message, Type: "Emote", Target: emoteTarget });
+
+	// Add directly to the chat log if this is a targeted emote.
+	if(emoteTarget != null) {
+		var targetName = ChatRoomGetWhisperTargetName();
+		var formattedMessage = TextGet("EmoteTo") + " " + targetName + ": " + ChatRoomFormatEmote(message, Player);
+		ChatRoomAddMessage(formattedMessage, "Whisper", Player.MemberNumber);
+	}
 }
 
 /**
