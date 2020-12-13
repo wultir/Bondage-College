@@ -217,3 +217,4 @@ VisibilityResetDescription,This will reset all items to be visible. Click again 
 VisibilityLocked,All items are forced visible under the Extreme difficulty mode
 LeaveSave,Accept changes
 LeaveNoSave,Cancel changes
+WhisperedEmotes,Send private emotes when whispering
