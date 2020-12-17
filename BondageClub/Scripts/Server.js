@@ -693,7 +693,7 @@ function ServerAccountBeep(data) {
 			if (CurrentScreen == "FriendList") ServerSend("AccountQuery", { Query: "OnlineFriends" });
 		} else if (data.BeepType == "Leash" && ChatRoomLeashPlayer == data.MemberNumber && data.ChatRoomName) {
 			if (Player.OnlineSharedSettings && Player.OnlineSharedSettings.AllowPlayerLeashing != false && ( CurrentScreen != "ChatRoom" || !ChatRoomData || (CurrentScreen == "ChatRoom" && ChatRoomData.Name != data.ChatRoomName))) {
-				if (ChatRoomCanBeLeashed(Player)) {
+				if (ChatRoomCanBeLeashedBy(data.MemberNumber, Player)) {
 					
 					ChatRoomJoinLeash = data.ChatRoomName
 					
