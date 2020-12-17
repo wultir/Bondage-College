@@ -81,10 +81,12 @@ function CharacterReset(CharacterID, CharacterAssetFamily) {
 		IsMouthOpen: function() { return this.Effect.indexOf("OpenMouth") >= 0 },
 		IsVulvaFull: function() { return this.Effect.indexOf("FillVulva") >= 0 },
 		IsOwned: function () { return ((this.Owner != null) && (this.Owner.trim() != "")) },
-		IsOwnedByPlayer: function () { return (((((this.Owner != null) && (this.Owner.trim() == Player.Name)) || (NPCEventGet(this, "EndDomTrial") > 0)) && (this.Ownership == null)) || ((this.Ownership != null) && (this.Ownership.MemberNumber != null) && (this.Ownership.MemberNumber == Player.MemberNumber))) },
+		IsOwnedByPlayer: function () { return (((((this.Owner != null) && (this.Owner.trim() == Player.Name)) || (NPCEventGet(this, "EndDomTrial") > 0)) && (this.Ownership == null)) || this.IsOwnedByMemberNumber(Player.MemberNumber)) },
+		IsOwnedByMemberNumber: function (memberNumber) { return (this.Ownership != null) && (this.Ownership.MemberNumber != null) && (this.Ownership.MemberNumber == memberNumber) },
 		IsOwner: function () { return ((NPCEventGet(this, "EndSubTrial") > 0) || (this.Name == Player.Owner.replace("NPC-", ""))) },
 		IsLoverOfPlayer: function () { return this.IsLover(Player); },
-		IsLover: function (C) { return ((this.GetLoversNumbers().indexOf(C.MemberNumber) >= 0) || (((this.Lover != null) && (this.Lover.trim() == C.Name)) || (NPCEventGet(this, "Girlfriend") > 0))); },
+		IsLover: function (C) { return (this.IsLoverOfMemberNumber(C.MemberNumber) || (((this.Lover != null) && (this.Lover.trim() == C.Name)) || (NPCEventGet(this, "Girlfriend") > 0))); },
+		IsLoverOfMemberNumber: function (memberNumber) { return this.GetLoversNumbers().indexOf(memberNumber) >= 0; },
 		GetLoversNumbers: function (MembersOnly) {
 			var LoversNumbers = [];
 			if (typeof this.Lovership == "undefined") return [];
