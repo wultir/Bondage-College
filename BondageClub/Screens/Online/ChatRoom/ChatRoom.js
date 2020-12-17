@@ -174,7 +174,7 @@ function ChatRoomCanBeLeashed(C) {
 			if (C.Appearance[A].Asset.Name.indexOf("Leash") >= 0 || (C.Appearance[A].Property && C.Appearance[A].Property.Type && C.Appearance[A].Property.Type.indexOf("Leash") >= 0)) {
 				canLeash = true
 				if (C.Appearance[A].Asset.Group.Name == "ItemNeckRestraints")
-					neckLock = InventoryGetLock(Player.Appearance[A])
+					neckLock = InventoryGetLock(C.Appearance[A])
 			}
 		}
 	if ((C.Effect.indexOf("Tethered") >= 0) || (C.Effect.indexOf("Mounted") >= 0) || (C.Effect.indexOf("Enclosed") >= 0)) isTrapped = true
