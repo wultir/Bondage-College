@@ -177,7 +177,7 @@ function ChatRoomCanBeLeashed(C) {
 					neckLock = InventoryGetLock(Player.Appearance[A])
 			}
 		}
-	if ((C.Effect.indexOf("Tethered") >= 0) || (C.Effect.indexOf("Mounted") >= 0) || (C.Effect.indexOf("Enclosed") >= 0)) isTrapped = true
+	if ((C.Effect.indexOf("Tethered") >= 0) || (C.Effect.indexOf("Mounted") >= 0) || (C.Effect.indexOf("Enclose") >= 0)) isTrapped = true
 	
 	if (canLeash && !isTrapped) {
 		if (!neckLock || (!neckLock.Asset.OwnerOnly && !neckLock.Asset.LoverOnly) ||
